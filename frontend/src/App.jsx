@@ -26,55 +26,56 @@ function formatDKK(value) {
 
 function RevenueChart({ pos, wolt }) {
   const max = Math.max(pos, wolt, 1);
-  const chartHeight = 160;
+  const height = 140;
 
   return (
-    <svg
-      viewBox="0 0 320 220"
-      width="100%"
-      height="220"
-      preserveAspectRatio="xMidYMid meet"
-    >
-      {/* POS */}
-      <rect
-        x="60"
-        y={chartHeight - (pos / max) * chartHeight}
-        width="80"
-        height={(pos / max) * chartHeight}
-        fill={colors.pos}
-        rx="6"
-      />
-      <text x="100" y="200" textAnchor="middle">
-        POS
-      </text>
-      <text
-        x="100"
-        y={chartHeight - (pos / max) * chartHeight - 8}
-        textAnchor="middle"
+    <div style={{ height: "220px", width: "100%" }}>
+      <svg
+        width="320"
+        height="220"
+        style={{ display: "block", margin: "0 auto" }}
       >
-        {formatDKK(pos)}
-      </text>
+        {/* POS */}
+        <rect
+          x="60"
+          y={height - (pos / max) * height}
+          width="80"
+          height={(pos / max) * height}
+          fill={colors.pos}
+          rx="6"
+        />
+        <text x="100" y="180" textAnchor="middle">
+          POS
+        </text>
+        <text
+          x="100"
+          y={height - (pos / max) * height - 6}
+          textAnchor="middle"
+        >
+          {formatDKK(pos)}
+        </text>
 
-      {/* Wolt */}
-      <rect
-        x="180"
-        y={chartHeight - (wolt / max) * chartHeight}
-        width="80"
-        height={(wolt / max) * chartHeight}
-        fill={colors.wolt}
-        rx="6"
-      />
-      <text x="220" y="200" textAnchor="middle">
-        Wolt
-      </text>
-      <text
-        x="220"
-        y={chartHeight - (wolt / max) * chartHeight - 8}
-        textAnchor="middle"
-      >
-        {formatDKK(wolt)}
-      </text>
-    </svg>
+        {/* Wolt */}
+        <rect
+          x="180"
+          y={height - (wolt / max) * height}
+          width="80"
+          height={(wolt / max) * height}
+          fill={colors.wolt}
+          rx="6"
+        />
+        <text x="220" y="180" textAnchor="middle">
+          Wolt
+        </text>
+        <text
+          x="220"
+          y={height - (wolt / max) * height - 6}
+          textAnchor="middle"
+        >
+          {formatDKK(wolt)}
+        </text>
+      </svg>
+    </div>
   );
 }
 
@@ -130,7 +131,7 @@ function App() {
         </div>
       </div>
 
-      <div style={{ ...cardStyle, marginBottom: "40px" }}>
+      <div style={{ ...cardStyle }}>
         <h2>Revenue Comparison</h2>
         <RevenueChart
           pos={data.revenue.pos}
