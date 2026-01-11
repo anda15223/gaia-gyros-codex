@@ -1,12 +1,28 @@
 import { useEffect, useState } from "react";
 
+const colors = {
+  bg: "#f5f7fa",
+  card: "#ffffff",
+  primary: "#1f7a8c",
+  secondary: "#3a86ff",
+  muted: "#6b7280"
+};
+
 const cardStyle = {
-  background: "#ffffff",
-  borderRadius: "12px",
-  padding: "20px",
-  boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+  background: colors.card,
+  borderRadius: "14px",
+  padding: "24px",
+  boxShadow: "0 6px 18px rgba(0,0,0,0.08)",
   minWidth: "220px"
 };
+
+function formatDKK(value) {
+  return new Intl.NumberFormat("da-DK", {
+    style: "currency",
+    currency: "DKK",
+    maximumFractionDigits: 0
+  }).format(value || 0);
+}
 
 function App() {
   const [data, setData] = useState(null);
@@ -33,45 +49,46 @@ function App() {
   return (
     <div
       style={{
+        minHeight: "100vh",
+        background: colors.bg,
         padding: "40px",
-        fontFamily: "Arial, sans-serif",
-        background: "#f4f6f8",
-        minHeight: "100vh"
+        fontFamily: "system-ui, Arial, sans-serif"
       }}
     >
-      <h1 style={{ marginBottom: "30px" }}>GAIA GYROS — Today</h1>
+      <h1 style={{ marginBottom: "8px" }}>GAIA GYROS</h1>
+      <p style={{ color: colors.muted, marginBottom: "32px" }}>
+        Today overview — {data.date}
+      </p>
 
       {/* KPI CARDS */}
       <div
         style={{
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
           gap: "20px",
-          flexWrap: "wrap",
           marginBottom: "40px"
         }}
       >
         <div style={cardStyle}>
-          <h3>Total Revenue</h3>
-          <p style={{ fontSize: "28px", fontWeight: "bold" }}>
-            {data.revenue.total}
-          </p>
+          <p style={{ color: colors.muted }}>Total Revenue</p>
+          <h2 style={{ color: colors.primary }}>
+            {formatDKK(data.revenue.total)}
+          </h2>
         </div>
 
         <div style={cardStyle}>
-          <h3>POS Revenue</h3>
-          <p style={{ fontSize: "24px" }}>{data.revenue.pos}</p>
+          <p style={{ color: colors.muted }}>POS Revenue</p>
+          <h3>{formatDKK(data.revenue.pos)}</h3>
         </div>
 
         <div style={cardStyle}>
-          <h3>Wolt Revenue</h3>
-          <p style={{ fontSize: "24px" }}>{data.revenue.wolt}</p>
+          <p style={{ color: colors.muted }}>Wolt Revenue</p>
+          <h3>{formatDKK(data.revenue.wolt)}</h3>
         </div>
 
         <div style={cardStyle}>
-          <h3>Staff Scheduled</h3>
-          <p style={{ fontSize: "24px" }}>
-            {data.labor.staffScheduled}
-          </p>
+          <p style={{ color: colors.muted }}>Staff Scheduled</p>
+          <h3>{data.labor.staffScheduled}</h3>
         </div>
       </div>
 
@@ -88,7 +105,7 @@ function App() {
       <div>
         <h2>Live Wolt Orders</h2>
         {data.woltLiveOrders.length === 0 ? (
-          <p>No live orders</p>
+          <p style={{ color: colors.muted }}>No live orders</p>
         ) : (
           <ul>
             {data.woltLiveOrders.map((order, idx) => (
