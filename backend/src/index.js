@@ -1,16 +1,20 @@
 import express from "express";
+import cors from "cors";
 import { getTodayShifts } from "./services/planday.js";
 import { getTodayOrders } from "./services/pos.js";
 import { getLiveOrders } from "./services/wolt.js";
 
 const app = express();
+
+// middleware
+app.use(cors());
 app.use(express.json());
 
 // helpers
 async function safeCall(fn, fallback) {
   try {
     return await fn();
-  } catch (e) {
+  } catch {
     return fallback;
   }
 }
@@ -33,18 +37,13 @@ app.get("/api/dashboard/today", async (req, res) => {
     safeCall(() => getLiveOrders(), [])
   ]);
 
-  // POS aggregation
   const posRevenue = Array.isArray(posOrders)
     ? posOrders.reduce((sum, o) => sum + (o.total || 0), 0)
     : 0;
 
-  // Wolt aggregation
   const woltRevenue = Array.isArray(woltOrders)
     ? woltOrders.reduce((sum, o) => sum + (o.total || 0), 0)
     : 0;
-
-  // Labor aggregation
-  const staffScheduled = Array.isArray(shifts) ? shifts.length : 0;
 
   res.json({
     date: new Date().toISOString().slice(0, 10),
@@ -58,7 +57,7 @@ app.get("/api/dashboard/today", async (req, res) => {
       wolt: Array.isArray(woltOrders) ? woltOrders.length : 0
     },
     labor: {
-      staffScheduled
+      staffScheduled: Array.isArray(shifts) ? shifts.length : 0
     },
     woltLiveOrders: Array.isArray(woltOrders) ? woltOrders : []
   });
