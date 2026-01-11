@@ -4,69 +4,67 @@ import { getTodayOrders } from "./services/pos.js";
 import { getLiveOrders } from "./services/wolt.js";
 
 const app = express();
-
-// middleware
 app.use(express.json());
 
-// health check
+// helpers
+async function safeCall(fn, fallback) {
+  try {
+    return await fn();
+  } catch (e) {
+    return fallback;
+  }
+}
+
+// health
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
-// test api
+// test
 app.get("/api/test", (req, res) => {
   res.json({ status: "ok" });
 });
 
-// planday shifts api
-app.get("/api/planday/shifts", async (req, res) => {
-  try {
-    const shifts = await getTodayShifts();
-    res.json(shifts);
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to fetch Planday shifts",
-      message: error.message
-    });
-  }
-});
+// unified dashboard
+app.get("/api/dashboard/today", async (req, res) => {
+  const [shifts, posOrders, woltOrders] = await Promise.all([
+    safeCall(() => getTodayShifts(), []),
+    safeCall(() => getTodayOrders(), []),
+    safeCall(() => getLiveOrders(), [])
+  ]);
 
-// online POS orders api
-app.get("/api/pos/orders", async (req, res) => {
-  try {
-    const orders = await getTodayOrders();
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to fetch POS orders",
-      message: error.message
-    });
-  }
-});
+  // POS aggregation
+  const posRevenue = Array.isArray(posOrders)
+    ? posOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+    : 0;
 
-// wolt live orders api
-app.get("/api/wolt/orders", async (req, res) => {
-  try {
-    const orders = await getLiveOrders();
-    res.json(orders);
-  } catch (error) {
-    res.status(500).json({
-      error: "Failed to fetch Wolt orders",
-      message: error.message
-    });
-  }
-});
+  // Wolt aggregation
+  const woltRevenue = Array.isArray(woltOrders)
+    ? woltOrders.reduce((sum, o) => sum + (o.total || 0), 0)
+    : 0;
 
-// unified dashboard (safe placeholder)
-app.get("/api/dashboard/today", (req, res) => {
+  // Labor aggregation
+  const staffScheduled = Array.isArray(shifts) ? shifts.length : 0;
+
   res.json({
-    status: "dashboard endpoint ready",
-    generatedAt: new Date().toISOString()
+    date: new Date().toISOString().slice(0, 10),
+    revenue: {
+      pos: posRevenue,
+      wolt: woltRevenue,
+      total: posRevenue + woltRevenue
+    },
+    orders: {
+      pos: Array.isArray(posOrders) ? posOrders.length : 0,
+      wolt: Array.isArray(woltOrders) ? woltOrders.length : 0
+    },
+    labor: {
+      staffScheduled
+    },
+    woltLiveOrders: Array.isArray(woltOrders) ? woltOrders : []
   });
 });
 
 const PORT = process.env.PORT || 4000;
-
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
