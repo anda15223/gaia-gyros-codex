@@ -1,6 +1,7 @@
 import express from "express";
 import { getTodayShifts } from "./services/planday.js";
 import { getTodayOrders } from "./services/pos.js";
+import { getLiveOrders } from "./services/wolt.js";
 
 const app = express();
 
@@ -43,8 +44,22 @@ app.get("/api/pos/orders", async (req, res) => {
   }
 });
 
+// wolt live orders api
+app.get("/api/wolt/orders", async (req, res) => {
+  try {
+    const orders = await getLiveOrders();
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch Wolt orders",
+      message: error.message
+    });
+  }
+});
+
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
+
