@@ -57,9 +57,16 @@ app.get("/api/wolt/orders", async (req, res) => {
   }
 });
 
+// unified dashboard (safe placeholder)
+app.get("/api/dashboard/today", (req, res) => {
+  res.json({
+    status: "dashboard endpoint ready",
+    generatedAt: new Date().toISOString()
+  });
+});
+
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
   console.log(`Backend running on port ${PORT}`);
 });
-
