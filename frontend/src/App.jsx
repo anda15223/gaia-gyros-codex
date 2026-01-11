@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const colors = {
   bg: "#f5f7fa",
@@ -25,57 +25,46 @@ function formatDKK(value) {
 }
 
 function RevenueChart({ pos, wolt }) {
-  const max = Math.max(pos, wolt, 1);
-  const height = 140;
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const max = Math.max(pos, wolt, 1);
+    const baseY = 160;
+    const scale = 120 / max;
+
+    // POS bar
+    ctx.fillStyle = colors.pos;
+    ctx.fillRect(80, baseY - pos * scale, 60, pos * scale);
+
+    // Wolt bar
+    ctx.fillStyle = colors.wolt;
+    ctx.fillRect(180, baseY - wolt * scale, 60, wolt * scale);
+
+    // Labels
+    ctx.fillStyle = "#000";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+
+    ctx.fillText("POS", 110, 185);
+    ctx.fillText("Wolt", 210, 185);
+
+    ctx.fillText(formatDKK(pos), 110, baseY - pos * scale - 8);
+    ctx.fillText(formatDKK(wolt), 210, baseY - wolt * scale - 8);
+  }, [pos, wolt]);
 
   return (
-    <div style={{ height: "220px", width: "100%" }}>
-      <svg
-        width="320"
-        height="220"
-        style={{ display: "block", margin: "0 auto" }}
-      >
-        {/* POS */}
-        <rect
-          x="60"
-          y={height - (pos / max) * height}
-          width="80"
-          height={(pos / max) * height}
-          fill={colors.pos}
-          rx="6"
-        />
-        <text x="100" y="180" textAnchor="middle">
-          POS
-        </text>
-        <text
-          x="100"
-          y={height - (pos / max) * height - 6}
-          textAnchor="middle"
-        >
-          {formatDKK(pos)}
-        </text>
-
-        {/* Wolt */}
-        <rect
-          x="180"
-          y={height - (wolt / max) * height}
-          width="80"
-          height={(wolt / max) * height}
-          fill={colors.wolt}
-          rx="6"
-        />
-        <text x="220" y="180" textAnchor="middle">
-          Wolt
-        </text>
-        <text
-          x="220"
-          y={height - (wolt / max) * height - 6}
-          textAnchor="middle"
-        >
-          {formatDKK(wolt)}
-        </text>
-      </svg>
-    </div>
+    <canvas
+      ref={canvasRef}
+      width={320}
+      height={200}
+      style={{ display: "block", margin: "0 auto" }}
+    />
   );
 }
 
@@ -131,7 +120,7 @@ function App() {
         </div>
       </div>
 
-      <div style={{ ...cardStyle }}>
+      <div style={cardStyle}>
         <h2>Revenue Comparison</h2>
         <RevenueChart
           pos={data.revenue.pos}
