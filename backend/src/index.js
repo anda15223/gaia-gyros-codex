@@ -1,5 +1,6 @@
 import express from "express";
 import { getTodayShifts } from "./services/planday.js";
+import { getTodayOrders } from "./services/pos.js";
 
 const app = express();
 
@@ -22,9 +23,21 @@ app.get("/api/planday/shifts", async (req, res) => {
     const shifts = await getTodayShifts();
     res.json(shifts);
   } catch (error) {
-    console.error(error);
     res.status(500).json({
       error: "Failed to fetch Planday shifts",
+      message: error.message
+    });
+  }
+});
+
+// online POS orders api
+app.get("/api/pos/orders", async (req, res) => {
+  try {
+    const orders = await getTodayOrders();
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({
+      error: "Failed to fetch POS orders",
       message: error.message
     });
   }
