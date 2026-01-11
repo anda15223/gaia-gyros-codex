@@ -26,39 +26,52 @@ function formatDKK(value) {
 
 function RevenueChart({ pos, wolt }) {
   const max = Math.max(pos, wolt, 1);
-  const height = 160;
+  const chartHeight = 160;
 
   return (
-    <svg width="100%" height={height + 40}>
-      {/* POS bar */}
+    <svg
+      viewBox="0 0 320 220"
+      width="100%"
+      height="220"
+      preserveAspectRatio="xMidYMid meet"
+    >
+      {/* POS */}
       <rect
-        x="40"
-        y={height - (pos / max) * height}
+        x="60"
+        y={chartHeight - (pos / max) * chartHeight}
         width="80"
-        height={(pos / max) * height}
+        height={(pos / max) * chartHeight}
         fill={colors.pos}
         rx="6"
       />
-      <text x="80" y={height + 20} textAnchor="middle">
+      <text x="100" y="200" textAnchor="middle">
         POS
       </text>
-      <text x="80" y={height - (pos / max) * height - 8} textAnchor="middle">
+      <text
+        x="100"
+        y={chartHeight - (pos / max) * chartHeight - 8}
+        textAnchor="middle"
+      >
         {formatDKK(pos)}
       </text>
 
-      {/* Wolt bar */}
+      {/* Wolt */}
       <rect
-        x="160"
-        y={height - (wolt / max) * height}
+        x="180"
+        y={chartHeight - (wolt / max) * chartHeight}
         width="80"
-        height={(wolt / max) * height}
+        height={(wolt / max) * chartHeight}
         fill={colors.wolt}
         rx="6"
       />
-      <text x="200" y={height + 20} textAnchor="middle">
+      <text x="220" y="200" textAnchor="middle">
         Wolt
       </text>
-      <text x="200" y={height - (wolt / max) * height - 8} textAnchor="middle">
+      <text
+        x="220"
+        y={chartHeight - (wolt / max) * chartHeight - 8}
+        textAnchor="middle"
+      >
         {formatDKK(wolt)}
       </text>
     </svg>
@@ -96,7 +109,6 @@ function App() {
         Today overview — {data.date}
       </p>
 
-      {/* KPI CARDS */}
       <div
         style={{
           display: "grid",
@@ -118,22 +130,12 @@ function App() {
         </div>
       </div>
 
-      {/* CHART */}
       <div style={{ ...cardStyle, marginBottom: "40px" }}>
         <h2>Revenue Comparison</h2>
         <RevenueChart
           pos={data.revenue.pos}
           wolt={data.revenue.wolt}
         />
-      </div>
-
-      {/* ORDERS */}
-      <div style={{ ...cardStyle, marginBottom: "40px" }}>
-        <h2>Orders</h2>
-        <ul>
-          <li>POS Orders: {data.orders.pos}</li>
-          <li>Wolt Orders: {data.orders.wolt}</li>
-        </ul>
       </div>
     </div>
   );
