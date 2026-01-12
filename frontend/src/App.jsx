@@ -1,3 +1,5 @@
+// THIS IS THE FILE VITE SHOULD USE
+
 import {
   BarChart,
   Bar,
