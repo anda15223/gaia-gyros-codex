@@ -1,4 +1,5 @@
-// THIS IS THE FILE VITE SHOULD USE
+import { useEffect, useState } from "react";
+import "./App.css";
 import {
   BarChart,
   Bar,
@@ -8,86 +9,70 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-function App() {
-  // MOCK DATA — temporary
-  const data = {
-    date: "2026-01-12",
-    revenue: {
-      pos: 3200,
-      wolt: 1800,
-      total: 5000,
-    },
-    orders: {
-      pos: 74,
-      wolt: 29,
-    },
-    labor: {
-      staffScheduled: 6,
-    },
-  };
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
-  const chartData = [
-    { name: "POS", value: data.revenue.pos },
-    { name: "Wolt", value: data.revenue.wolt },
+function App() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/dashboard/today`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error("Failed to fetch dashboard data");
+        }
+        return res.json();
+      })
+      .then((json) => {
+        setData(json);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return <div className="loading">Loading dashboard…</div>;
+  }
+
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
+
+  const revenueChartData = [
+    { name: "POS", revenue: data.revenue.pos },
+    { name: "Wolt", revenue: data.revenue.wolt },
   ];
 
   return (
-    <div
-      style={{
-        padding: 32,
-        fontFamily: "Arial, sans-serif",
-      }}
-    >
-      <h1 style={{ marginBottom: 4 }}>GAIA GYROS</h1>
-      <p style={{ color: "#666", marginTop: 0 }}>
-        Today overview — {data.date}
-      </p>
+    <div className="dashboard">
+      <h1>Today’s Dashboard</h1>
 
-      {/* KPI GRID */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-          gap: 16,
-          marginTop: 24,
-        }}
-      >
-        <Kpi title="Total Revenue" value={`${data.revenue.total} DKK`} />
-        <Kpi title="POS Revenue" value={`${data.revenue.pos} DKK`} />
-        <Kpi title="Wolt Revenue" value={`${data.revenue.wolt} DKK`} />
-        <Kpi title="POS Orders" value={data.orders.pos} />
-        <Kpi title="Wolt Orders" value={data.orders.wolt} />
-        <Kpi title="Staff Scheduled" value={data.labor.staffScheduled} />
+      <div className="kpis">
+        <div className="kpi">
+          <h3>Total Revenue</h3>
+          <p>{data.revenue.total} DKK</p>
+        </div>
+
+        <div className="kpi">
+          <h3>POS Orders</h3>
+          <p>{data.orders.pos}</p>
+        </div>
+
+        <div className="kpi">
+          <h3>Wolt Orders</h3>
+          <p>{data.orders.wolt}</p>
+        </div>
+
+        <div className="kpi">
+          <h3>Staff Scheduled</h3>
+          <p>{data.labor.staffScheduled}</p>
+        </div>
       </div>
 
-      {/* CHART */}
-      <div style={{ marginTop: 40, height: 300 }}>
-        <ResponsiveContainer>
-          <BarChart data={chartData}>
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="value" />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
-  );
-}
-
-function Kpi({ title, value }) {
-  return (
-    <div
-      style={{
-        padding: 16,
-        borderRadius: 8,
-        backgroundColor: "#f5f5f5",
-      }}
-    >
-      <div style={{ fontSize: 12, color: "#666" }}>{title}</div>
-      <div style={{ fontSize: 24, fontWeight: "bold" }}>{value}</div>
-    </div>
-  );
-}
-
-export default App;
+      <div className="panel">
+        <h2>Revenue Breakdown</h2>
