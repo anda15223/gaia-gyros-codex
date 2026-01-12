@@ -1,69 +1,60 @@
 import express from "express";
 import cors from "cors";
-import { getTodayShifts } from "./services/planday.js";
-import { getTodayOrders } from "./services/pos.js";
-import { getLiveOrders } from "./services/wolt.js";
+import "dotenv/config";
+
+import { fetchPlandayShifts } from "./services/planday.js";
+import { fetchPOSOrders } from "./services/pos.js";
+import { fetchWoltOrders } from "./services/wolt.js";
 
 const app = express();
+const PORT = 4000;
 
-// middleware
 app.use(cors());
 app.use(express.json());
 
-// helpers
-async function safeCall(fn, fallback) {
-  try {
-    return await fn();
-  } catch {
-    return fallback;
-  }
-}
-
-// health
 app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
-// test
-app.get("/api/test", (req, res) => {
-  res.json({ status: "ok" });
-});
+async function safeCall(fn) {
+  try {
+    return await fn();
+  } catch (err) {
+    console.error(err.message);
+    return [];
+  }
+}
 
-// unified dashboard
 app.get("/api/dashboard/today", async (req, res) => {
-  const [shifts, posOrders, woltOrders] = await Promise.all([
-    safeCall(() => getTodayShifts(), []),
-    safeCall(() => getTodayOrders(), []),
-    safeCall(() => getLiveOrders(), [])
+  const date = new Date().toISOString().slice(0, 10);
+
+  const [posOrders, woltOrders, shifts] = await Promise.all([
+    safeCall(fetchPOSOrders),
+    safeCall(fetchWoltOrders),
+    safeCall(fetchPlandayShifts),
   ]);
 
-  const posRevenue = Array.isArray(posOrders)
-    ? posOrders.reduce((sum, o) => sum + (o.total || 0), 0)
-    : 0;
-
-  const woltRevenue = Array.isArray(woltOrders)
-    ? woltOrders.reduce((sum, o) => sum + (o.total || 0), 0)
-    : 0;
+  const posRevenue = posOrders.reduce((s, o) => s + (o.total || 0), 0);
+  const woltRevenue = woltOrders.reduce((s, o) => s + (o.total || 0), 0);
 
   res.json({
-    date: new Date().toISOString().slice(0, 10),
+    date,
     revenue: {
       pos: posRevenue,
       wolt: woltRevenue,
-      total: posRevenue + woltRevenue
+      total: posRevenue + woltRevenue,
     },
     orders: {
-      pos: Array.isArray(posOrders) ? posOrders.length : 0,
-      wolt: Array.isArray(woltOrders) ? woltOrders.length : 0
+      pos: posOrders.length,
+      wolt: woltOrders.length,
     },
     labor: {
-      staffScheduled: Array.isArray(shifts) ? shifts.length : 0
+      staffScheduled: shifts.length,
     },
-    woltLiveOrders: Array.isArray(woltOrders) ? woltOrders : []
+    woltLiveOrders: woltOrders,
   });
 });
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend running on port ${PORT}`);
 });
