@@ -9,36 +9,31 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
-
 function App() {
   const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/api/dashboard/today`)
+    fetch("http://localhost:4000/api/dashboard/today")
       .then((res) => {
         if (!res.ok) {
           throw new Error("Failed to fetch dashboard data");
         }
         return res.json();
       })
-      .then((json) => {
-        setData(json);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      });
+      .then((json) => setData(json))
+      .catch((err) => setError(err.message));
   }, []);
 
-  if (loading) return <div className="loading">Loading dashboard…</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (error) {
+    return <div className="error">Error: {error}</div>;
+  }
 
-  const revenueChartData = [
+  if (!data) {
+    return <div className="loading">Loading…</div>;
+  }
+
+  const chartData = [
     { name: "POS", revenue: data.revenue.pos },
     { name: "Wolt", revenue: data.revenue.wolt },
   ];
@@ -72,7 +67,7 @@ function App() {
       <div className="panel">
         <h2>Revenue Breakdown</h2>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={revenueChartData}>
+          <BarChart data={chartData}>
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
@@ -92,3 +87,11 @@ function App() {
                 {order.customerName} — {order.status}
               </li>
             ))}
+          </ul>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default App;
