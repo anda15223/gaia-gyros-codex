@@ -55,7 +55,7 @@ app.get("/api/dashboard/today", async (req, res) => {
   });
 });
 
-// IMPORTANT: listen on all interfaces (fixes Windows localhost issue)
+// Windows-safe listen
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Backend running on port ${PORT}`);
 });
