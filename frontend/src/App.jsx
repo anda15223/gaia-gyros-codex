@@ -35,13 +35,8 @@ function App() {
       });
   }, []);
 
-  if (loading) {
-    return <div className="loading">Loading dashboard…</div>;
-  }
-
-  if (error) {
-    return <div className="error">Error: {error}</div>;
-  }
+  if (loading) return <div className="loading">Loading dashboard…</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   const revenueChartData = [
     { name: "POS", revenue: data.revenue.pos },
@@ -76,3 +71,24 @@ function App() {
 
       <div className="panel">
         <h2>Revenue Breakdown</h2>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={revenueChartData}>
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="revenue" />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
+      <div className="panel">
+        <h2>Live Wolt Orders</h2>
+        {data.woltLiveOrders.length === 0 ? (
+          <p>No live orders</p>
+        ) : (
+          <ul>
+            {data.woltLiveOrders.map((order) => (
+              <li key={order.id}>
+                {order.customerName} — {order.status}
+              </li>
+            ))}
