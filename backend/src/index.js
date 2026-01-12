@@ -85,6 +85,7 @@ app.get("/api/dashboard/today", async (req, res) => {
   });
 });
 
+// Windows-safe listen
 app.listen(PORT, "0.0.0.0", () => {
 =======
 /**
