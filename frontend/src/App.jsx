@@ -31,13 +31,18 @@ function App() {
   ];
 
   return (
-    <div style={{ padding: 32, fontFamily: "Arial, sans-serif" }}>
+    <div
+      style={{
+        padding: 32,
+        fontFamily: "Arial, sans-serif",
+      }}
+    >
       <h1 style={{ marginBottom: 4 }}>GAIA GYROS</h1>
       <p style={{ color: "#666", marginTop: 0 }}>
         Today overview — {data.date}
       </p>
 
-      {/* KPI ROW */}
+      {/* KPI GRID */}
       <div
         style={{
           display: "grid",
@@ -75,7 +80,7 @@ function Kpi({ title, value }) {
       style={{
         padding: 16,
         borderRadius: 8,
-        background: "#f5f5f5",
+        backgroundColor: "#f5f5f5",
       }}
     >
       <div style={{ fontSize: 12, color: "#666" }}>{title}</div>
