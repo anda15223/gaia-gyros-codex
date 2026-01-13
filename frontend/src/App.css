@@ -1,78 +1,68 @@
-/* Reset small defaults */
 * {
   box-sizing: border-box;
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Ubuntu, "Helvetica Neue", Arial, sans-serif;
-  background: #f4f6f8;
-  color: #1f2937;
-}
-
-/* Main layout */
+/* Main container */
 .dashboard {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 40px 24px;
 }
 
+/* Title */
 .dashboard h1 {
-  margin-bottom: 24px;
-  font-size: 28px;
-  font-weight: 600;
+  font-size: 32px;
+  margin-bottom: 32px;
+  color: #111827;
 }
 
-/* KPI cards */
+/* KPI grid */
 .kpis {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 40px;
 }
 
+/* KPI cards – VERY visible */
 .kpi {
-  background: #ffffff;
-  border-radius: 10px;
-  padding: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  background: #2563eb; /* strong blue */
+  color: white;
+  border-radius: 12px;
+  padding: 24px;
 }
 
 .kpi h3 {
-  margin: 0 0 8px;
+  margin: 0 0 12px;
   font-size: 14px;
   font-weight: 500;
-  color: #6b7280;
+  opacity: 0.85;
 }
 
 .kpi p {
   margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-  color: #111827;
+  font-size: 26px;
+  font-weight: 700;
 }
 
 /* Panels */
 .panel {
-  background: #ffffff;
-  border-radius: 10px;
+  background: white;
+  border: 3px solid #111827; /* obvious border */
+  border-radius: 12px;
   padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  margin-bottom: 32px;
 }
 
 .panel h2 {
   margin-top: 0;
   margin-bottom: 16px;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
 }
 
 /* Lists */
 .panel ul {
-  margin: 0;
-  padding-left: 18px;
+  padding-left: 20px;
 }
 
 .panel li {
@@ -82,11 +72,10 @@ body {
 /* States */
 .loading,
 .error {
-  padding: 40px;
   text-align: center;
-  font-size: 16px;
+  padding: 40px;
 }
 
 .error {
-  color: #b91c1c;
+  color: red;
 }
