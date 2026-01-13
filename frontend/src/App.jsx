@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import "./App.css";
 import {
   BarChart,
   Bar,
@@ -19,69 +18,47 @@ function App() {
         if (!res.ok) throw new Error("Failed to fetch dashboard data");
         return res.json();
       })
-      .then((json) => setData(json))
+      .then(setData)
       .catch((err) => setError(err.message));
   }, []);
 
-  if (error) return <div className="error">Error: {error}</div>;
-  if (!data) return <div className="loading">Loading…</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!data) return <div>Loading…</div>;
 
-  const chartData = [
-    { name: "POS", revenue: data.revenue.pos },
-    { name: "Wolt", revenue: data.revenue.wolt },
-  ];
+  const box = (bg) => ({
+    background: bg,
+    color: "white",
+    padding: "24px",
+    borderRadius: "12px",
+    fontSize: "26px",
+    fontWeight: "800",
+  });
 
   return (
-    <div className="dashboard">
-      <h1>Today’s Dashboard</h1>
+    <div style={{ padding: 40, background: "#eee", minHeight: "100vh" }}>
+      <h1 style={{ fontSize: 32 }}>INLINE STYLE TEST</h1>
 
-      <div className="kpis">
-        <div className="kpi revenue">
-          <h3>Total Revenue</h3>
-          <p>{data.revenue.total} DKK</p>
-        </div>
-
-        <div className="kpi pos">
-          <h3>POS Orders</h3>
-          <p>{data.orders.pos}</p>
-        </div>
-
-        <div className="kpi wolt">
-          <h3>Wolt Orders</h3>
-          <p>{data.orders.wolt}</p>
-        </div>
-
-        <div className="kpi staff">
-          <h3>Staff Scheduled</h3>
-          <p>{data.labor.staffScheduled}</p>
-        </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 20 }}>
+        <div style={box("green")}>REVENUE {data.revenue.total}</div>
+        <div style={box("blue")}>POS {data.orders.pos}</div>
+        <div style={box("orange")}>WOLT {data.orders.wolt}</div>
+        <div style={box("gray")}>STAFF {data.labor.staffScheduled}</div>
       </div>
 
-      <div className="panel">
-        <h2>Revenue Breakdown</h2>
+      <div style={{ background: "white", marginTop: 40, padding: 20 }}>
         <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={chartData}>
+          <BarChart
+            data={[
+              { name: "POS", revenue: data.revenue.pos },
+              { name: "Wolt", revenue: data.revenue.wolt },
+            ]}
+          >
             <XAxis dataKey="name" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="revenue" />
+            <Bar dataKey="revenue" fill="black" />
           </BarChart>
         </ResponsiveContainer>
-      </div>
-
-      <div className="panel">
-        <h2>Live Wolt Orders</h2>
-        {data.woltLiveOrders.length === 0 ? (
-          <p>No live orders</p>
-        ) : (
-          <ul>
-            {data.woltLiveOrders.map((order) => (
-              <li key={order.id}>
-                {order.customerName} — {order.status}
-              </li>
-            ))}
-          </ul>
-        )}
       </div>
     </div>
   );
