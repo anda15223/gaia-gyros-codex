@@ -16,22 +16,15 @@ function App() {
   useEffect(() => {
     fetch("http://localhost:4000/api/dashboard/today")
       .then((res) => {
-        if (!res.ok) {
-          throw new Error("Failed to fetch dashboard data");
-        }
+        if (!res.ok) throw new Error("Failed to fetch dashboard data");
         return res.json();
       })
       .then((json) => setData(json))
       .catch((err) => setError(err.message));
   }, []);
 
-  if (error) {
-    return <div className="error">Error: {error}</div>;
-  }
-
-  if (!data) {
-    return <div className="loading">Loading…</div>;
-  }
+  if (error) return <div className="error">Error: {error}</div>;
+  if (!data) return <div className="loading">Loading…</div>;
 
   const chartData = [
     { name: "POS", revenue: data.revenue.pos },
@@ -43,22 +36,22 @@ function App() {
       <h1>Today’s Dashboard</h1>
 
       <div className="kpis">
-        <div className="kpi">
+        <div className="kpi revenue">
           <h3>Total Revenue</h3>
           <p>{data.revenue.total} DKK</p>
         </div>
 
-        <div className="kpi">
+        <div className="kpi pos">
           <h3>POS Orders</h3>
           <p>{data.orders.pos}</p>
         </div>
 
-        <div className="kpi">
+        <div className="kpi wolt">
           <h3>Wolt Orders</h3>
           <p>{data.orders.wolt}</p>
         </div>
 
-        <div className="kpi">
+        <div className="kpi staff">
           <h3>Staff Scheduled</h3>
           <p>{data.labor.staffScheduled}</p>
         </div>
